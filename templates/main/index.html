@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление заказами - Логист</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            padding: 8px 15px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+
+        .btn-active {
+            background-color: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .btn-view-all {
+            background-color: transparent;
+            border: none;
+            color: #2196F3;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .order-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .order-item {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        .order-item:hover {
+            border-color: #2196F3;
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+        }
+
+        .order-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .order-info {
+            margin-right: 80px;
+        }
+
+        .courier-list, .vehicle-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .courier-item, .vehicle-item {
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .courier-item:hover, .vehicle-item:hover {
+            border-color: #2196F3;
+            background-color: #f0f8ff;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-new {
+            background-color: #FFEB3B;
+            color: #333;
+        }
+
+        .status-in-progress {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .status-completed {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .order-client {
+            margin-top: 5px;
+            color: #555;
+        }
+
+        .order-address {
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .limited-list {
+            max-height: 300px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Управление заказами</h1>
+        <button class="logout-btn" onclick="logout()">Выйти из системы</button>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Заказы на доставку (5)</h2>
+                    <button class="btn btn-primary">Добавить заказ</button>
+                </div>
+
+                <div class="filter-buttons">
+                    <button class="btn btn-outline btn-active">Все</button>
+                    <button class="btn btn-outline">Новые</button>
+                    <button class="btn btn-outline">В процессе</button>
+                    <button class="btn btn-outline">Доставленные</button>
+                </div>
+
+                <div class="order-list">
+                    <div class="order-item" onclick="openOrderDetails(12345)">
+                        <div class="order-actions">
+                            <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="event.stopPropagation(); editOrder(12345)">✏️</button>
+                            <button class="btn btn-warning" style="padding: 5px 8px;" onclick="event.stopPropagation(); cancelOrder(12345)">Отменить</button>
+                        </div>
+                        <div class="order-info">
+                            <h3>Заказ #12345</h3>
+                            <div class="order-address">Адрес доставки: Пр. Ленина, 42</div>
+                            <div class="order-client">Клиент: Иванов Иван, +7 (123) 456-7890</div>
+                            <span class="status status-new">Новый</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item" onclick="openOrderDetails(12346)">
+                        <div class="order-actions">
+                            <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="event.stopPropagation(); editOrder(12346)">✏️</button>
+                            <button class="btn btn-warning" style="padding: 5px 8px;" onclick="event.stopPropagation(); cancelOrder(12346)">Отменить</button>
+                        </div>
+                        <div class="order-info">
+                            <h3>Заказ #12346</h3>
+                            <div class="order-address">Адрес доставки: Ул. Кирова, 13</div>
+                            <div class="order-client">Клиент: Петров Петр, +7 (987) 654-3210</div>
+                            <span class="status status-in-progress">В процессе</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item" onclick="openOrderDetails(12347)">
+                        <div class="order-actions">
+                            <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="event.stopPropagation(); editOrder(12347)">✏️</button>
+                            <button class="btn btn-warning" style="padding: 5px 8px;" onclick="event.stopPropagation(); cancelOrder(12347)">Отменить</button>
+                        </div>
+                        <div class="order-info">
+                            <h3>Заказ #12347</h3>
+                            <div class="order-address">Адрес доставки: Ул. Садовая, 7</div>
+                            <div class="order-client">Клиент: Сидорова Анна, +7 (555) 123-4567</div>
+                            <span class="status status-completed">Доставлен</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item" onclick="openOrderDetails(12348)">
+                        <div class="order-actions">
+                            <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="event.stopPropagation(); editOrder(12348)">✏️</button>
+                            <button class="btn btn-warning" style="padding: 5px 8px;" onclick="event.stopPropagation(); cancelOrder(12348)">Отменить</button>
+                        </div>
+                        <div class="order-info">
+                            <h3>Заказ #12348</h3>
+                            <div class="order-address">Адрес доставки: Ул. Гагарина, 15</div>
+                            <div class="order-client">Клиент: Кузнецов Дмитрий, +7 (999) 888-7777</div>
+                            <span class="status status-new">Новый</span>
+                        </div>
+                    </div>
+
+                    <div class="order-item" onclick="openOrderDetails(12349)">
+                        <div class="order-actions">
+                            <button class="btn btn-secondary" style="padding: 5px 8px;" onclick="event.stopPropagation(); editOrder(12349)">✏️</button>
+                            <button class="btn btn-warning" style="padding: 5px 8px;" onclick="event.stopPropagation(); cancelOrder(12349)">Отменить</button>
+                        </div>
+                        <div class="order-info">
+                            <h3>Заказ #12349</h3>
+                            <div class="order-address">Адрес доставки: Пр. Мира, 28</div>
+                            <div class="order-client">Клиент: Фёдорова Ольга, +7 (111) 222-3333</div>
+                            <span class="status status-in-progress">В процессе</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="section">
+                <div class="section-header">
+                    <h2>Курьеры на смене (3)</h2>
+                    <button class="btn-view-all" onclick="viewAllCouriers()">Просмотр всех</button>
+                </div>
+                <div class="courier-list limited-list">
+                    <div class="courier-item" onclick="assignOrderToCourier(1)">
+                        <p><strong>Смирнов Алексей</strong></p>
+                        <p>Телефон: +7 (111) 222-3333</p>
+                        <p>Текущий заказ: #12346</p>
+                    </div>
+                    <div class="courier-item" onclick="assignOrderToCourier(2)">
+                        <p><strong>Кузнецова Мария</strong></p>
+                        <p>Телефон: +7 (444) 555-6666</p>
+                        <p>Свободен</p>
+                    </div>
+                    <div class="courier-item" onclick="assignOrderToCourier(3)">
+                        <p><strong>Петров Иван</strong></p>
+                        <p>Телефон: +7 (777) 888-9999</p>
+                        <p>Текущий заказ: #12349</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h2>Транспортные средства (3)</h2>
+                    <button class="btn-view-all" onclick="viewAllVehicles()">Просмотр всех</button>
+                </div>
+                <div class="vehicle-list limited-list">
+                    <div class="vehicle-item" onclick="assignVehicleToOrder(1)">
+                        <p><strong>Газель</strong> (гр. 1.5т)</p>
+                        <p>Номер: А123БВ777</p>
+                        <p>Статус: В работе</p>
+                    </div>
+                    <div class="vehicle-item" onclick="assignVehicleToOrder(2)">
+                        <p><strong>Легковой авто</strong> (седан)</p>
+                        <p>Номер: У456ХК777</p>
+                        <p>Статус: Свободен</p>
+                    </div>
+                    <div class="vehicle-item" onclick="assignVehicleToOrder(3)">
+                        <p><strong>Микроавтобус</strong> (гр. 3т)</p>
+                        <p>Номер: О789РТ777</p>
+                        <p>Статус: В работе</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функции для обработки действий (заглушки)
+        function openOrderDetails(orderId) {
+            console.log('Открываем детали заказа', orderId);
+            // Здесь будет переход на страницу деталей заказа или открытие модального окна
+        }
+
+        function editOrder(orderId) {
+            console.log('Редактируем заказ', orderId);
+            // Здесь будет логика редактирования заказа
+        }
+
+        function cancelOrder(orderId) {
+            console.log('Отменяем заказ', orderId);
+            if(confirm('Вы уверены, что хотите отменить этот заказ?')) {
+                // Здесь будет логика отмены заказа
+            }
+        }
+
+        function assignOrderToCourier(courierId) {
+            console.log('Назначаем заказ курьеру', courierId);
+            // Здесь будет логика назначения заказа курьеру
+        }
+
+        function assignVehicleToOrder(vehicleId) {
+            console.log('Назначаем транспортное средство заказу', vehicleId);
+            // Здесь будет логика назначения ТС
+        }
+
+        function viewAllCouriers() {
+            console.log('Просмотр всех курьеров');
+            // Здесь будет переход на страницу со всеми курьерами
+        }
+
+        function viewAllVehicles() {
+            console.log('Просмотр всех транспортных средств');
+            // Здесь будет переход на страницу со всеми ТС
+        }
+
+        function logout() {
+            if(confirm('Вы действительно хотите выйти из системы?')) {
+                console.log('Выход из системы');
+                // Здесь будет логика выхода из системы
+            }
+        }
+
+        // Обработка фильтрации заказов
+        document.querySelectorAll('.filter-buttons .btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.filter-buttons .btn').forEach(b => {
+                    b.classList.remove('btn-active');
+                });
+                this.classList.add('btn-active');
+
+                // Здесь будет логика фильтрации заказов
+                console.log('Фильтруем заказы по:', this.textContent);
+            });
+        });
+    </script>
+</body>
+</html>
