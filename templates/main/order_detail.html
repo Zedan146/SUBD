@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %} Детали заказа #{{ order.number }} {% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<h1>Заказ #{{ order.number }}</h1>
+
+<div class="order-info">
+    <p><strong>Клиент:</strong> {{ order.client.full_name }}</p>
+    <p><strong>Телефон:</strong> {{ order.client.phone }}</p>
+    <p><strong>Адрес доставки:</strong> {{ order.delivery_address }}</p>
+    <p><strong>Сумма заказа:</strong> {{ order.order_amount }} ₽</p>
+    <p><strong>Стоимость доставки:</strong> {{ order.delivery_cost }} ₽</p>
+    <p><strong>Статус:</strong>
+        <span class="status status-{{ order.status }}">
+                {{ order.get_status_display }}
+            </span>
+    </p>
+
+    {% if order.courier %}
+    <p><strong>Курьер:</strong> {{ order.courier.full_name }}</p>
+    {% endif %}
+
+    {% if order.vehicle %}
+    <p><strong>Транспорт:</strong> {{ order.vehicle }} ({{ order.vehicle.plate_number }})</p>
+    {% endif %}
+</div>
+
+<div class="courier-assignment">
+    <h3>Назначить курьера</h3>
+    <div class="courier-list">
+        {% for courier in available_couriers %}
+        <div class="courier-item">
+            <p>{{ courier.full_name }} ({{ courier.phone }})</p>
+            <form action="{% url 'assign_courier' order.id %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="courier_id" value="{{ courier.id }}">
+                <button type="submit">Назначить</button>
+            </form>
+        </div>
+        {% empty %}
+        <p>Нет доступных курьеров</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="order-actions">
+    {% if order.status == 'new' %}
+    <form action="{% url 'change_status' order.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="in_progress">
+        <button type="submit" class="btn btn-primary">Взять в работу</button>
+    </form>
+    {% elif order.status == 'in_progress' %}
+    <form action="{% url 'change_status' order.id %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="delivered">
+        <button type="submit" class="btn btn-success">Завершить доставку</button>
+    </form>
+    {% endif %}
+</div>
+
+<a href="{% url 'index' %}">Вернуться к списку заказов</a>
+{% endblock %}

@@ -41,7 +41,6 @@ class Vehicle(models.Model):
         ('in_use', 'В работе'),
     )
 
-    name = models.CharField('Название', max_length=100)
     type = models.CharField('Тип ТС', max_length=20, choices=VEHICLE_TYPES)
     plate_number = models.CharField('Гос. номер', max_length=20, unique=True)
     status = models.CharField(
@@ -118,7 +117,7 @@ class Order(models.Model):
         ('canceled', 'Отменен'),
     )
 
-    number = models.CharField('Номер заказа', max_length=20, unique=True)
+    number = models.CharField('Номер заказа', max_length=20, unique=True, blank=True)
     client = models.ForeignKey(
         Client,
         on_delete=models.PROTECT,
@@ -136,6 +135,7 @@ class Order(models.Model):
         'Стоимость доставки',
         max_digits=10,
         decimal_places=2,
+        blank=True,
         validators=[MinValueValidator(0)]
     )
     status = models.CharField(
